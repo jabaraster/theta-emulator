@@ -1,0 +1,113 @@
+@import "_vars.less";
+
+body {
+    color: @main-color;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+
+
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#00001e+0,505064+100 */
+    background: rgb(0,0,30); /* Old browsers */
+    background: -moz-linear-gradient(top,  rgba(0,0,30,1) 0%, rgba(80,80,100,1) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,30,1)), color-stop(100%,rgba(80,80,100,1))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  rgba(0,0,30,1) 0%,rgba(80,80,100,1) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  rgba(0,0,30,1) 0%,rgba(80,80,100,1) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  rgba(0,0,30,1) 0%,rgba(80,80,100,1) 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  rgba(0,0,30,1) 0%,rgba(80,80,100,1) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00001e', endColorstr='#505064',GradientType=0 ); /* IE6-9 */
+
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.Page {
+    position: relative;
+    padding: 0;
+    div {
+        padding: 0;
+    }
+    div.back {
+        margin-top: 10px;
+        margin-left: 10px;
+        font-size: 200%;
+        color: rgba(255,255,255,1);
+        cursor: pointer;
+    }
+}
+
+.PropertyList {
+    ul.properties {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        width: 100vw;
+    }
+    li.property {
+        margin-left: auto; margin-right: auto;
+        margin-top: 2px;
+        margin-bottom: 2px;
+        box-shadow: 1px 1px 2px rgba(255,255,255,.5);
+        width: 95%;
+        background: rgba(255,255,255,.9);
+        height: 130px;
+        cursor: pointer;
+    }
+}
+
+.RoomList {
+    ul.rooms {
+        margin-bottom: 2px;
+    }
+    li.room {
+        background: rgba(255,255,255,.9);
+        float: left;
+        cursor: pointer;
+        height: 150px;
+        width: 150px;
+        margin: 2px;
+        box-shadow: 1px 1px 2px rgba(255,255,255,.5);
+        position: relative;
+    }
+    .add-room {
+        display: block;
+        color: rgba(180,180,180,.8);
+        text-shadow: 1px 1px 2px rgba(30,30,30,.5);
+        font-size: 300%;
+        text-align: center;
+        padding-top: 50px;
+    }
+}
+
+.Room {
+    position: relative;
+    height: 100%;
+    .room-thumbnail {
+        display: block;
+        width: 100%;
+    }
+    .room-name {
+        position: absolute;
+        width: 100%;
+        bottom: 0;
+    }
+}
+
+.fade-enter {
+    transition: .5s ease-in;
+    opacity: .1;
+}
+.fade-enter.fade-enter-active {
+    opacity: 1;
+}
+.fade-leave {
+    transition: .5s ease-out;
+    opacity: 1;
+}
+.fade-leave.fade-leave-active {
+    opacity: .1;
+}
