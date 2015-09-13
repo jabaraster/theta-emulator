@@ -1,220 +1,72 @@
 'use strict';
 
-const React = require('react/addons');
+const React = require('react');
 
 const Bootstrap = require('react-bootstrap');
-const Button = require('react-bootstrap');
-const Glyphicon = Bootstrap.Glyphicon;
-const Modal = Bootstrap.Modal;
-const CSSTransitionGroup = React.addons.CSSTransitionGroup;
-/*
-const ButtonToolbar = Bootstrap.ButtonToolbar;
-const ButtonGroup = Bootstrap.ButtonGroup;
 const Button = Bootstrap.Button;
-const Label = Bootstrap.Label;
-const Input = Bootstrap.Input;
-const TabbedArea = Bootstrap.TabbedArea;
-const TabPane = Bootstrap.TabPane;
-*/
-const ajax = require('./component/app-ajax.js');
+const Glyphicon = Bootstrap.Glyphicon;
+const ajax = require('superagent');
 const classNames = require('classnames');
-
-const PropertyList = React.createClass({
-    propTypes: {
-        data: React.PropTypes.array.isRequired,
-        onPropertyClick: React.PropTypes.func.isRequired,
-    },
-    handleClick: function(pProperty) {
-        this.props.onPropertyClick({ property: pProperty });
-    },
-    render: function() {
-        return (
-            <ul className="properties">
-                {this.props.data.map((pProperty, idx) => {
-                    return (
-                        <li key={idx} className="property" onClick={this.handleClick.bind(this, pProperty)}>{pProperty.Name}</li>
-                    );
-                })}
-            </ul>
-        );
-    },
-});
-
-const RoomList = React.createClass({
-    propTypes: {
-        data: React.PropTypes.array.isRequired,
-        onRoomClick: React.PropTypes.func.isRequired,
-        onAddRoomClick: React.PropTypes.func.isRequired,
-    },
-    handleRoomClick: function(e) {
-        this.props.onRoomClick(e);
-    },
-    handleAddRoomClick: function() {
-        this.props.onAddRoomClick();
-    },
-    render: function() {
-        const rows = this.props.data.map((pRoom, idx) => {
-                        return (
-                            <li key={idx} className="room">
-                                <Room data={pRoom} onRoomClick={this.props.onRoomClick} />
-                            </li>
-                        );
-                    });
-        const add = (
-                <li key={this.props.data.length} className="room" onClick={this.handleAddRoomClick}>
-                    <Glyphicon glyph="plus" className="add-room" />
-                </li>
-        );
-        rows.push(add);
-        return (
-            <ul className="rooms">
-                {rows}
-            </ul>
-        );
-    },
-});
-
-const Room = React.createClass({
-    propTypes: {
-        data: React.PropTypes.object.isRequired,
-        onRoomClick: React.PropTypes.func.isRequired,
-    },
-    handleRoomClick: function() {
-        this.props.onRoomClick({ room: this.props.data });
-    },
-    render: function() {
-        return (
-            <div className="Room" onClick={this.handleRoomClick}>
-                <img className="room-thumbnail" src="/pano/pano.jpg" />
-                <div className="room-name">{this.props.data.Name}</div>
-            </div>
-        );
-    },
-});
-
-const BackButton = React.createClass({
-    propTypes: {
-        onClick: React.PropTypes.func.isRequired,
-    },
-    handleClick: function() {
-        this.props.onClick();
-    },
-    render: function() {
-        return (
-            <CSSTransitionGroup component="div" transitionName="fade" className="back">
-                <Glyphicon glyph="circle-arrow-left" onClick={this.handleClick} />
-            </CSSTransitionGroup>
-        );
-    },
-});
-
-const RoomEditor = React.createClass({
-    render: function() {
-        return (
-            <div>
-                <h1>RoomEditor</h1>
-            </div>
-        );
-    },
-});
 
 const Page = React.createClass({
     getInitialState: function() {
         return {
-            properties: InitialData,
-            currentProperty: null,
-            propertyListVisible: true,
-            viewMode: 'select-property',
+            url: '',
+            response: '',
         };
     },
-    handlePropertyClick: function(e) {
-        this.setState({ currentProperty: e.property, viewMode: 'select-room' });
+    handleUrlChange: function() {
+        this.setState({ url: React.findDOMNode(this.refs.url).value });
     },
-    handleBackClickOnSelectRoom: function() {
-        this.setState({ viewMode: 'select-property' });
-    },
-    handleRoomClick: function(e) {
-        this.setState({ viewMode: 'view-room' });
-    },
-    handleBackClickOnViewRoom: function() {
-        this.setState({ viewMode: 'select-room' });
-    },
-    handleBackClickOnEditRoom: function() {
-        this.setState({ viewMode: 'select-room' });
-    },
-    handleAddRoomClick: function() {
-        this.setState({ viewMode: 'edit-room' });
+    handleClick: function() {
+        const url = React.findDOMNode(this.refs.url).value;
+        const json = React.findDOMNode(this.refs.request).value;
+        if (!url) {
+            return;
+        }
+        ajax.post(url).
+            send(json).
+            set('content-type', 'application/json').
+            end((err, res) => {
+                if (err) {
+                    console.log(err);
+                    console.log(res);
+                    alert('エラー発生. ブラウザのコンソールを確認すること.');
+                    return;
+                }
+                if (!res.ok) {
+                    console.log(res);
+                    alert('ブラウザのコンソールを確認すること.');
+                    return;
+                }
+                this.setState({ response: res.text });
+            });
     },
     render: function() {
         return (
-            <div className="Page">
-                <CSSTransitionGroup transitionName="fade" component="div" className="PropertyList">
-                    {this.state.viewMode === 'select-property' ?
-                    <PropertyList data={this.state.properties} onPropertyClick={this.handlePropertyClick} />
-                    : null}
-                </CSSTransitionGroup>
-
-                <CSSTransitionGroup transitionName="fade" component="div">
-                    {this.state.viewMode === 'select-room' ?
-                    <BackButton onClick={this.handleBackClickOnSelectRoom} />
-                    : null}
-                </CSSTransitionGroup>
-                <CSSTransitionGroup transitionName="fade" component="div" className="RoomList">
-                    {this.state.viewMode === 'select-room' ?
-                    <RoomList data={this.state.currentProperty ? this.state.currentProperty.Rooms : []}
-                              onRoomClick={this.handleRoomClick}
-                              onAddRoomClick={this.handleAddRoomClick}
+            <div className="Page container">
+                <div className="form-group">
+                    <label htmlFor="url-text">URL:</label>
+                    <input type="text" id="url-text" className="form-control" ref="url"
+                           value={this.state.url}
+                           onChange={this.handleUrlChange}
                     />
-                    : null}
-                </CSSTransitionGroup>
-
-                <CSSTransitionGroup transitionName="fade" component="div">
-                    {this.state.viewMode === 'edit-room' ?
-                    <BackButton onClick={this.handleBackClickOnEditRoom} />
-                    : null}
-                </CSSTransitionGroup>
-                <CSSTransitionGroup transitionName="fade" component="div" className="RoomEditor">
-                    {this.state.viewMode === 'edit-room' ?
-                    <RoomEditor />
-                    : null}
-                </CSSTransitionGroup>
-
-                <CSSTransitionGroup transitionName="fade" component="div">
-                    {this.state.viewMode === 'view-room' ?
-                    <BackButton onClick={this.handleBackClickOnViewRoom} />
-                    : null}
-                </CSSTransitionGroup>
+                </div>
+                <div className="form-group">
+                    <label htmlFor="request-text">Request:</label>
+                    <textarea id="request-text" className="form-control" ref="request"></textarea>
+                </div>
+                <div className="form-group">
+                    <label htmlFor="response-text">Response:</label>
+                    <textarea id="response-text" className="form-control" ref="response" value={this.state.response}></textarea>
+                </div>
+                <Button bsStyle="primary" onClick={this.handleClick} disabled={this.state.url.length === 0}>
+                    <Glyphicon glyph="ok"/>
+                </Button>
             </div>
         );
     },
 });
-
-const InitialData = [
-    {   Name: '森都心プラザ',
-        Rooms: [{ Name: '２階プラザ' }, { Name: '２階図書館' }, { Name: '３階ビジネス図書館' }, { Name: '５階大ホール' }, ]
-    },
-    {   Name: '森都心プラザ1',
-        Rooms: [{ Name: '２階プラザ' }, { Name: '２階図書館' }, { Name: '３階ビジネス図書館' }, { Name: '５階大ホール' }, ]
-    },
-    {   Name: '森都心プラザ2',
-        Rooms: [{ Name: '２階プラザ' }, { Name: '２階図書館' }, { Name: '３階ビジネス図書館' }, { Name: '５階大ホール' }, ]
-    },
-    {   Name: '森都心プラザ3',
-        Rooms: [{ Name: '２階プラザ' }, { Name: '２階図書館' }, { Name: '３階ビジネス図書館' }, { Name: '５階大ホール' }, ]
-    },
-    {   Name: 'ザ・熊本タワー',
-        Rooms: [{ Name: '101号室' }, { Name: '905号室' }, ]
-    },
-    {   Name: 'ザ・熊本タワー1',
-        Rooms: [{ Name: '101号室' }, { Name: '905号室' }, ]
-    },
-    {   Name: 'ザ・熊本タワー2',
-        Rooms: [{ Name: '101号室' }, { Name: '905号室' }, ]
-    },
-    {   Name: 'ザ・熊本タワー3',
-        Rooms: [{ Name: '101号室' }, { Name: '905号室' }, ]
-    },
-    ];
 
 React.render(
     <Page />,

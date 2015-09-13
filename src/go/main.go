@@ -21,7 +21,7 @@ func main() {
 
 	resourceMux := web.New()
 //	resourceMux.Use(middleware.AjaxAuthenticator)
-	resourceMux.Get ("/resource/property/", handler.GetAllPropertiesHandler)
+	resourceMux.Post("/osc/commands/execute", handler.StartSessionHandler)
 
 	staticMux := web.New()
 	staticMux.Get("/css/*", webtool.GetAssetsHandlerWithContentType("text/css", ASSET_ROOT))
@@ -40,7 +40,7 @@ func main() {
 	// 競合する指定は優先させたいMuxを先に記述する必要がある.
 	defaultMux := goji.DefaultMux
 	defaultMux.Handle("/", htmlMux)
-	defaultMux.Handle("/resource/*", resourceMux)
+	defaultMux.Handle("/osc/*", resourceMux)
 
 	defaultMux.Handle("/css/*", staticMux)
 	defaultMux.Handle("/js/*", staticMux)
